@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <title>А. Югнаки мектебі: Қазақ тілі тесті</title>
+    <style>
+        :root {
+            --primary: #0984e3;
+            --secondary: #74b9ff;
+            --accent: #fdcb6e;
+            --text-dark: #2d3436;
+            --white: #ffffff;
+            --danger: #d63031;
+            --success: #00b894;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Сіздің суретіңіз осы жерге қойылады */
+            background: url('C:\Users\jakot\Downloads\bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            backdrop-filter: blur(3px); /* Фонды сәл бұлдырату мәтін жақсы оқылуы үшін */
+        }
+
+        /* Эмблема стилі */
+        .emblem {
+            width: 150px;
+            height: 150px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px auto;
+            border: 5px solid var(--accent);
+            box-shadow: 0 0 20px rgba(253, 203, 110, 0.6);
+            font-weight: bold;
+            color: var(--primary);
+            text-align: center;
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95); /* Жартылай мөлдір ақ фон */
+            width: 90%;
+            max-width: 800px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            position: relative;
+        }
+
+        /* Беттердің көрінуі */
+        .screen { display: none; animation: fadeIn 0.5s; }
+        .active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        h1, h2 { color: var(--primary); }
+        
+        .btn {
+            padding: 12px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-accent { background: var(--accent); color: var(--text-dark); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn:hover { transform: scale(1.05); }
+        .btn:disabled { background: #b2bec3; cursor: not-allowed; transform: none; }
+
+        input[type="text"] {
+            padding: 15px;
+            width: 70%;
+            border: 2px solid #dfe6e9;
+            border-radius: 8px;
+            font-size: 18px;
+            margin: 20px 0;
+            outline: none;
+        }
+        input[type="text"]:focus { border-color: var(--primary); }
+
+        /* Тест сұрақтары */
+        .question-box {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: var(--text-dark);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .option-btn {
+            background: #f1f2f6;
+            border: 2px solid #dfe6e9;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 16px;
+        }
+        .option-btn:hover { background: #e0e0e0; }
+        .option-btn.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Навигация батырмалары */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        /* Нәтиже экраны */
+        .score-display { font-size: 50px; color: var(--primary); font-weight: bold; margin: 10px 0; }
+        .quote-box {
+            background: #ffeaa7;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #d35400;
+            border-left: 5px solid #d35400;
+        }
+        .mistake-list {
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #fab1a0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .mistake-item { border-bottom: 1px solid rgba(0,0,0,0.1); padding: 10px 0; }
+        
+        /* Тиындар */
+        .coins-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--accent);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="coins-badge">💰 Тиындар: <span id="total-coins">0</span></div>
+
+    <div id="intro-screen" class="screen active">
+        <div class="emblem">
+            <p>А. ЮГНАКИ<br>МЕКТЕБІ</p>
+        </div>
+        <h1>Қош келдіңіз!</h1>
+        <p>Бұл тест 8-сынып Қазақ тілі пәні бойынша біліміңізді тексеруге арналған.</p>
+        <button class="btn btn-primary" onclick="showLogin()">Жалғастыру ➜</button>
+    </div>
+
+    <div id="login-screen" class="screen">
+        <h2>Оқушыны тіркеу</h2>
+        <p>Тестілеуді бастамас бұрын есіміңізді жазыңыз:</p>
+        <input type="text" id="username" placeholder="Аты-жөніңіз..." autocomplete="off">
+        <br>
+        <button class="btn btn-accent" onclick="startGame()">Тестті бастау ▶</button>
+    </div>
+
+    <div id="game-screen" class="screen">
+        <div style="color: #636e72; margin-bottom: 10px;">Сұрақ: <span id="q-number">1</span> / 40</div>
+        <div class="question-box" id="q-text">Сұрақ жүктелуде...</div>
+        
+        <div class="options-grid" id="options-area">
+            </div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-primary" id="prev-btn" onclick="prevQuestion()" disabled>⬅ Артқа</button>
+            <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()">Келесі ➡</button>
+            <button class="btn btn-danger" id="finish-btn" onclick="finishTest()" style="display:none;">Аяқтау ✅</button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h2 id="result-title">Тест аяқталды!</h2>
+        <p><span id="player-name"></span>, сіздің нәтижеңіз:</p>
+        <div class="score-display"><span id="score">0</span> / 40</div>
+        
+        <div id="motivation-msg"></div>
+        
+        <div id="mistakes-container" style="display: none;">
+            <h3>Қатемен жұмыс:</h3>
+            <div class="mistake-list" id="mistakes-list"></div>
+        </div>
+
+        <button class="btn btn-primary" onclick="location.reload()">Қайта тапсыру ↻</button>
+    </div>
+</div>
+
+<script>
+    // 40 СҰРАҚ БАЗАСЫ (Сұрақ, Жауаптар, Дұрыс жауаптың индексі)
+    // Дұрыс жауаптың индексін (c) әрқашан 0 деп бере беріңіз, программа өзі араластырады.
+    const rawQuestions = [
+        {q: "Тұрлаулы мүшелерді атаңыз:", a: ["Бастауыш, баяндауыш", "Анықтауыш, пысықтауыш", "Толықтауыш", "Қарсылықты бағыныңқы"], c: 0},
+        {q: "Сөйлемнің негізін не құрайды?", a: ["Бастауыш пен баяндауыш", "Анықтауыш", "Пысықтауыш", "Қыстырма сөз"], c: 0},
+        {q: "Пысықтауыштың сұрақтарын табыңыз:", a: ["Қалай? Қашан? Қайда?", "Кім? Не?", "Кімді? Нені?", "Қандай? Қай?"], c: 0},
+        {q: "Күрделі бастауышты табыңыз:", a: ["Абай Құнанбаев - ұлы ақын", "Мен келдім", "Ол оқыды", "Күн жылыды"], c: 0},
+        {q: "Қыстырма сөзді табыңыз:", a: ["Меніңше", "Және", "Бірақ", "Себебі"], c: 0},
+        {q: "Жай сөйлемнің неше түрі бар?", a: ["4 (Жақты, жақсыз, атаулы, толымсыз)", "2", "5", "6"], c: 0},
+        {q: "Атаулы сөйлемді тап:", a: ["Күз.", "Мен барамын.", "Жаңбыр жауды.", "Ол келді."], c: 0},
+        {q: "Мақалды толықтыр: 'Оқу - ... бұлағы'", a: ["Білім", "Өнер", "Еңбек", "Тәрбие"], c: 0},
+        {q: "Тура толықтауыштың жалғауын табыңыз:", a: ["Табыс септігі", "Барыс септігі", "Ілік септігі", "Көмектес септігі"], c: 0},
+        {q: "Қаратпа сөз қатысқан сөйлемді тап:", a: ["Балам, бері кел.", "Күн шықты.", "Мектепке бардық.", "Ол ертең келеді."], c: 0},
+        {q: "Тұрақты тіркестің мағынасын тап: 'Төбесі көкке жету'", a: ["Қуану", "Қорқу", "Ренжу", "Биік болу"], c: 0},
+        {q: "Одағай сөзді табыңыз:", a: ["Әттең", "Және", "Бірақ", "Сондықтан"], c: 0},
+        {q: "Мезгіл пысықтауыштың сұрағы:", a: ["Қашан?", "Қайда?", "Не үшін?", "Қалай?"], c: 0},
+        {q: "Қарсылықты жалғаулықты табыңыз:", a: ["Бірақ", "Және", "Өйткені", "Да, де"], c: 0},
+        {q: "Көмекші есімді табыңыз:", a: ["Үсті", "Кітап", "Жасыл", "Отыр"], c: 0},
+        {q: "Баяндауыштың асты қалай сызылады?", a: ["Екі түзу", "Бір түзу", "Ирек сызық", "Үзік сызық"], c: 0},
+        {q: "Туынды сын есімді тап:", a: ["Көрікті", "Биік", "Ақ", "Кең"], c: 0},
+        {q: "Жақсыз сөйлемді табыңыз:", a: ["Менің барғым келеді.", "Күн суытты.", "Ол оқып отыр.", "Күз келді."], c: 0},
+        {q: "Қайталанбалы қос сөзді тап:", a: ["Биік-биік", "Ата-ана", "Кітап-ситап", "Ерік-жігер"], c: 0},
+        {q: "Стилистика неше түрге бөлінеді?", a: ["5", "3", "4", "6"], c: 0},
+        {q: "Ресми іс-қағаздар стиліне не жатады?", a: ["Өтініш", "Өлең", "Әңгіме", "Мақал"], c: 0},
+        {q: "Көркем әдебиет стилінің ерекшелігі:", a: ["Образдылық", "Нақтылық", "Терминдер", "Дәлелділік"], c: 0},
+        {q: "Публицистикалық стиль қайда қолданылады?", a: ["Газет-журналда", "Ғылыми еңбекте", "Заңда", "Күнделікті өмірде"], c: 0},
+        {q: "Ғылыми стильге тән сөздер:", a: ["Терминдер", "Эмоционалды сөздер", "Диалект", "Тұрпайы сөздер"], c: 0},
+        {q: "Төл сөз дегеніміз не?", a: ["Біреудің сөзінің өзгеріссіз берілуі", "Мазмұнын айту", "Автордың сөзі", "Жанама сөз"], c: 0},
+        {q: "Автор сөзі төл сөзден кейін келсе қандай тыныс белгі қойылады?", a: ["Үтір, сызықша", "Сызықша", "Қос нүкте", "Жақша"], c: 0},
+        {q: "Қыстырма сөз сөйлемнің басында келсе:", a: ["Өзінен кейін үтір қойылады", "Екі жағынан үтір", "Үтір қойылмайды", "Сызықша қойылады"], c: 0},
+        {q: "Біріккен сөзді тап:", a: ["Бүгін", "Қызыл ала", "Ата-ана", "Күн жылы"], c: 0},
+        {q: "Қос сөзді тап:", a: ["Көрші-қолаң", "Белбеу", "Аққұба", "Сарыарқа"], c: 0},
+        {q: "Қысқарған сөзді тап:", a: ["ҚР", "Мемлекет", "Заң", "Оқушы"], c: 0},
+        {q: "Зат есімнің сұрақтары:", a: ["Кім? Не?", "Қандай?", "Не істеді?", "Қалай?"], c: 0},
+        {q: "Етістік нені білдіреді?", a: ["Заттың қимылын", "Заттың атын", "Заттың санын", "Заттың сынын"], c: 0},
+        {q: "Сан есімнің түрлері нешеу?", a: ["6", "5", "4", "7"], c: 0},
+        {q: "Сын есімнің шырайлары:", a: ["2", "3", "4", "5"], c: 0},
+        {q: "Есімдікті тап:", a: ["Мен", "Оқу", "Жазу", "Кітап"], c: 0},
+        {q: "Шылау сөзді тап:", a: ["Үшін", "Келді", "Әдемі", "Үй"], c: 0},
+        {q: "Одағайдың түрлері:", a: ["Көңіл-күй, шақыру, жекіру", "Сапалық, қатыстық", "Дара, күрделі", "Негізгі, туынды"], c: 0},
+        {q: "Еліктеу сөзді тап:", a: ["Жарқ-жұрқ", "Бала-шаға", "Аласа", "Күлу"], c: 0},
+        {q: "Сөйлемнің бірыңғай мүшелерінің арасына не қойылады?", a: ["Үтір", "Нүкте", "Сұрақ белгісі", "Леп белгісі"], c: 0},
+        {q: "Мәтіннің тақырыбы деген не?", a: ["Не туралы айтылғаны", "Мәтіннің мазмұны", "Қорытындысы", "Басы"], c: 0}
+    ];
+
+    // Ойын айнымалылары
+    let gameQuestions = [];
+    let currentIdx = 0;
+    let userAnswers = new Array(40).fill(null); // Пайдаланушының таңдаған жауаптары (индекстері)
+    let userName = "";
+    let coins = localStorage.getItem('schoolCoins') ? parseInt(localStorage.getItem('schoolCoins')) : 0;
+
+    document.getElementById("total-coins").innerText = coins;
+
+    // Функция: Экранды ауыстыру
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function showLogin() {
+        showScreen('login-screen');
+    }
+
+    // Функция: Массивті араластыру (Fisher-Yates shuffle)
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // Ойынды бастау және сұрақтарды дайындау
+    function startGame() {
+        const nameInput = document.getElementById("username");
+        if (!nameInput.value.trim()) {
+            alert("Есіміңізді жазыңыз!");
+            return;
+        }
+        userName = nameInput.value;
+
+        // Сұрақтарды өңдеу: Жауап нұсқаларын араластыру
+        gameQuestions = rawQuestions.map(q => {
+            // Дұрыс жауаптың мәтінін сақтап аламыз
+            let correctText = q.a[q.c];
+            // Жауаптардың көшірмесін жасап, араластырамыз
+            let shuffledOptions = shuffleArray([...q.a]);
+            // Араласқан массивтегі дұрыс жауаптың жаңа индексін табамыз
+            let newCorrectIndex = shuffledOptions.indexOf(correctText);
+            
+            return {
+                q: q.q,
+                a: shuffledOptions,
+                c: newCorrectIndex
+            };
+        });
+
+        // Сұрақтардың өздерін де араластыруға болады (қаласаңыз)
+        // gameQuestions = shuffleArray(gameQuestions);
+
+        showScreen('game-screen');
+        renderQuestion();
+    }
+
+    // Сұрақты экранға шығару
+    function renderQuestion() {
+        const q = gameQuestions[currentIdx];
+        document.getElementById("q-number").innerText = currentIdx + 1;
+        document.getElementById("q-text").innerText = q.q;
+
+        const optionsHtml = document.getElementById("options-area");
+        optionsHtml.innerHTML = "";
+
+        q.a.forEach((opt, index) => {
+            const btn = document.createElement("div");
+            btn.className = "option-btn";
+            if (userAnswers[currentIdx] === index) {
+                btn.classList.add("selected");
+            }
+            btn.innerText = opt; // A, B, C әріптерін алып тастадық, тек мәтін қалады немесе CSS арқылы қосуға болады
+            btn.onclick = () => selectOption(index);
+            optionsHtml.appendChild(btn);
+        });
+
+        // Батырмаларды басқару
+        document.getElementById("prev-btn").disabled = (currentIdx === 0);
+        
+        if (currentIdx === gameQuestions.length - 1) {
+            document.getElementById("next-btn").style.display = "none";
+            document.getElementById("finish-btn").style.display = "inline-block";
+        } else {
+            document.getElementById("next-btn").style.display = "inline-block";
+            document.getElementById("finish-btn").style.display = "none";
+        }
+    }
+
+    // Жауапты таңдау
+    function selectOption(index) {
+        userAnswers[currentIdx] = index;
+        renderQuestion(); // Қайта сызу (түсін өзгерту үшін)
+    }
+
+    // Келесі сұрақ
+    function nextQuestion() {
+        if (currentIdx < gameQuestions.length - 1) {
+            currentIdx++;
+            renderQuestion();
+        }
+    }
+
+    // Алдыңғы сұрақ
+    function prevQuestion() {
+        if (currentIdx > 0) {
+            currentIdx--;
+            renderQuestion();
+        }
+    }
+
+    // Тестті аяқтау және есептеу
+    function finishTest() {
+        // Барлық сұраққа жауап берілгенін тексеру (міндетті емес, бірақ дұрыс болады)
+        let unanswered = userAnswers.filter(a => a === null).length;
+        if (unanswered > 0) {
+            if (!confirm(`Сіз ${unanswered} сұраққа жауап бермедіңіз. Аяқтай бересіз бе?`)) return;
+        }
+
+        let score = 0;
+        let mistakes = [];
+
+        for (let i = 0; i < gameQuestions.length; i++) {
+            if (userAnswers[i] === gameQuestions[i].c) {
+                score++;
+            } else {
+                mistakes.push({
+                    q: gameQuestions[i].q,
+                    correct: gameQuestions[i].a[gameQuestions[i].c]
+                });
+            }
+        }
+
+        showResults(score, mistakes);
+    }
+
+    function showResults(score, mistakes) {
+        showScreen('result-screen');
+        document.getElementById("player-name").innerText = userName;
+        document.getElementById("score").innerText = score;
+
+        const msgBox = document.getElementById("motivation-msg");
+        let reward = 0;
+
+        // Логика және Мотивация
+        if (score <= 25) {
+            msgBox.innerHTML = `
+                <div class="quote-box">
+                    "Талаптың мініп тұлпарын,<br>
+                    Тас қияға өрлеңіз.<br>
+                    Білімнің ашып сарайын,<br>
+                    Болашақты көргеніз!" <br>
+                    — <b>Ахмет Югнаки</b> (немесе Абай/Ыбырай)
+                </div>
+                <h3 style="color: #e17055;">Еш мұңайма!</h3>
+                <p>Бұл тек сынақ қана. Сенің қолыңнан бәрі келеді. Тағы бір рет қайталап көрсең, міндетті түрде жеңесің! 💪</p>
+            `;
+            reward = 15;
+        } else if (score <= 35) {
+            msgBox.innerHTML = `
+                <h3 style="color: #0984e3;">Жарайсың! Өте жақсы нәтиже! 👍</h3>
+                <p>Сен тақырыпты жақсы түсініпсің.</p>
+            `;
+            reward = 25;
+        } else {
+            msgBox.innerHTML = `
+                <h3 style="color: #00b894;">Керемет! Нағыз үздік! 🌟</h3>
+                <p>Сен барлық тақырыпты толық меңгеріпсің!</p>
+            `;
+            reward = 40;
+        }
+
+        // Тиындарды қосу
+        coins += reward;
+        localStorage.setItem('schoolCoins', coins);
+        document.getElementById("total-coins").innerText = coins;
+
+        // Қателерді көрсету
+        const mistakesContainer = document.getElementById("mistakes-container");
+        const list = document.getElementById("mistakes-list");
+        if (mistakes.length > 0) {
+            mistakesContainer.style.display = "block";
+            list.innerHTML = "";
+            mistakes.forEach(m => {
+                list.innerHTML += `<div class="mistake-item"><b>Сұрақ:</b> ${m.q}<br><span style="color:green">Дұрыс жауап: ${m.correct}</span></div>`;
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
